@@ -1,0 +1,1 @@
+typedef ChangedCallback = void Function();

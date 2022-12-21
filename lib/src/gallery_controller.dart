@@ -9,41 +9,46 @@ class GalleryController extends ChangeNotifier {
   List<int> _selectedIndexes = [];
   List<int> get selectedIndexes => _selectedIndexes;
 
+  XFile? _photo;
+  XFile? get photo => _photo;
+
   int _currentPage = 0;
   int get currentPage => _currentPage;
 
   int? _lastPage;
   int? get lastPage => _lastPage;
 
-  fetchNewMedia() async {
+  refreshWidget() {
+    _gridGalleryKey.currentState?._();
+  }
+
+  load() async {
     _lastPage = _currentPage;
     final PermissionState _ps = await PhotoManager.requestPermissionExtend();
     if (_ps.isAuth) {
       List<AssetPathEntity> albums =
           await PhotoManager.getAssetPathList(onlyAll: true);
       List<AssetEntity> media =
-          await albums[0].getAssetListPaged(size: 30, page: currentPage);
+          await albums[0].getAssetListPaged(size: 30, page: _currentPage);
       List<GalleryModel> temp = [];
 
       for (var asset in media) {
-        final data = await asset.thumbnailDataWithSize(ThumbnailSize(200, 200));
-        temp.add(GalleryModel(data: data!, asset: asset));
+        final thumbnail =
+            await asset.thumbnailDataWithSize(ThumbnailSize(200, 200));
+        final data = await asset.file;
+        temp.add(
+            GalleryModel(thumbnail: thumbnail!, data: data!, asset: asset));
       }
       _items = [..._items, ...temp];
       _currentPage++;
     } else {
       await PhotoManager.requestPermissionExtend();
     }
+    refreshWidget();
     notifyListeners();
   }
 
-  add(GalleryModel data) {
-    _items = [..._items, data];
-    selectedIndexes.add(_items.indexOf(data));
-    notifyListeners();
-  }
-
-  toggle(GalleryModel data) {
+  toggle({required GalleryModel data}) {
     _items = [
       for (final value in _items)
         if (value.data == data.data)
@@ -57,25 +62,44 @@ class GalleryController extends ChangeNotifier {
             element.data == data.data && element.asset == data.asset)
         .first);
 
-    if (selectedIndexes.contains(index)) {
-      selectedIndexes.remove(index);
+    if (_selectedIndexes.contains(index)) {
+      _selectedIndexes.remove(index);
     } else {
-      selectedIndexes.add(index);
+      _selectedIndexes.add(index);
     }
+    refreshWidget();
     notifyListeners();
   }
 
-  remove(GalleryModel data) {
-    _items = [
-      for (final value in _items)
-        if (value.data != data.data) data,
-    ];
+  deselectAll() {
+    _items = [for (final value in _items) value.copyWith(isSelected: false)];
+    _selectedIndexes.clear();
+    refreshWidget();
     notifyListeners();
   }
 
-  refresh() async {
-    _items = [];
-    await fetchNewMedia();
+  getPhoto() async {
+    final ImagePicker _picker = ImagePicker();
+    _photo = await _picker.pickImage(source: ImageSource.camera);
+    refreshWidget();
     notifyListeners();
   }
+
+  // add(GalleryModel data) {
+  //   _items = [..._items, data];
+  //   _selectedIndexes.add(_items.indexOf(data));
+  //   notifyListeners();
+  // }
+
+  // remove(GalleryModel data) {
+  //   _items = [
+  //     for (final value in _items)
+  //       if (value.data != data.data) data,
+  //   ];
+  //   notifyListeners();
+  // }
+
+  // refresh() async {
+  //   await fetchNewMedia();
+  // }
 }

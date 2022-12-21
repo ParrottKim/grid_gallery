@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:grid_gallery/src/callback/callback.dart';
 import 'package:grid_gallery/src/model/gallery_model.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:photo_manager/photo_manager.dart';
 
 part 'gallery_controller.dart';
@@ -13,15 +15,29 @@ class GridGallery extends StatefulWidget {
       color: Colors.white,
     ),
     this.videoIconAlign = Alignment.bottomRight,
+    this.isCameraSupported = true,
+    this.cameraIcon = const Icon(
+      Icons.camera_alt_outlined,
+      color: Colors.white,
+      size: 36.0,
+    ),
+    this.cameraSectionBackgroundColor = Colors.black87,
     this.unselectedCircleSize = 24.0,
     this.unselectedCircleBorderWidth = 2.0,
     this.unselectedBackgroundColor = Colors.transparent,
     this.unselectedBorderColor = Colors.white,
     this.selectedCircleSize = 24.0,
     this.selectedCircleBorderWidth = 2.0,
-    this.selectedBackgroundColor = Colors.red,
+    selectedBackgroundColor,
     this.selectedBorderColor = Colors.white,
+    this.selectedTextStyle = const TextStyle(
+      fontWeight: FontWeight.w700,
+      color: Colors.white,
+    ),
+    this.onChanged,
   })  : controller = controller ?? GalleryController(),
+        selectedBackgroundColor =
+            selectedBackgroundColor ?? Colors.black.withOpacity(0.4),
         super(key: controller?._gridGalleryKey);
 
   final GalleryController controller;
@@ -29,6 +45,10 @@ class GridGallery extends StatefulWidget {
   final int crossAxisCount;
   final Icon videoIcon;
   final Alignment videoIconAlign;
+
+  final bool isCameraSupported;
+  final Icon cameraIcon;
+  final Color cameraSectionBackgroundColor;
 
   final double unselectedCircleSize;
   final double unselectedCircleBorderWidth;
@@ -40,6 +60,10 @@ class GridGallery extends StatefulWidget {
   final Color selectedBackgroundColor;
   final Color selectedBorderColor;
 
+  final TextStyle selectedTextStyle;
+
+  final ChangedCallback? onChanged;
+
   @override
   State<GridGallery> createState() => _GridGalleryState();
 }
@@ -47,58 +71,105 @@ class GridGallery extends StatefulWidget {
 class _GridGalleryState extends State<GridGallery> {
   ScrollController scrollController = ScrollController();
 
+  void _listenController() {
+    setState(() {});
+  }
+
   @override
   void initState() {
     super.initState();
-    // widget.controller.fetchNewMedia();
+    widget.controller.addListener(_listenController);
+    _load();
+  }
+
+  @override
+  void didUpdateWidget(covariant GridGallery oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    print('didUpdateWidget');
+    if (oldWidget.controller.items.length != widget.controller.items.length) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        setState(() {});
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    widget.controller.removeListener(_listenController);
+    super.dispose();
+  }
+
+  _load() {
+    widget.controller.load();
+  }
+
+  _toggle({required GalleryModel data}) {
+    widget.controller.toggle(data: data);
+    widget.onChanged?.call();
+  }
+
+  _() {
+    setState(() {});
   }
 
   _handleScrollEvent(ScrollNotification scroll) {
     if (scroll.metrics.pixels / scroll.metrics.maxScrollExtent > 0.7) {
       if (widget.controller.currentPage != widget.controller.lastPage) {
-        widget.controller.fetchNewMedia();
+        widget.controller.load();
       }
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Select Photo'),
-      ),
-      body: RefreshIndicator(
-        onRefresh: () async => await widget.controller.refresh(),
-        child: NotificationListener<ScrollNotification>(
-          onNotification: (ScrollNotification scroll) {
-            _handleScrollEvent(scroll);
-            return false;
-          },
-          child: GridView.builder(
-            physics: const AlwaysScrollableScrollPhysics(
-                parent: ClampingScrollPhysics()),
-            controller: scrollController,
-            itemCount: widget.controller.items.length,
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: widget.crossAxisCount,
-            ),
-            itemBuilder: (context, index) => InkWell(
-              onTap: () =>
-                  widget.controller.toggle(widget.controller.items[index]),
+    final itemCount = widget.isCameraSupported
+        ? widget.controller.items.length + 1
+        : widget.controller.items.length;
+
+    return RefreshIndicator(
+      onRefresh: () async => await _load(),
+      child: NotificationListener<ScrollNotification>(
+        onNotification: (ScrollNotification scroll) {
+          _handleScrollEvent(scroll);
+          return false;
+        },
+        child: GridView.builder(
+          physics: const AlwaysScrollableScrollPhysics(
+              parent: ClampingScrollPhysics()),
+          controller: scrollController,
+          itemCount: itemCount,
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: widget.crossAxisCount,
+          ),
+          itemBuilder: (context, index) {
+            final itemIndex = widget.isCameraSupported ? index - 1 : index;
+            if (widget.isCameraSupported && index == 0) {
+              return InkWell(
+                onTap: () async {},
+                child: Ink(
+                  color: widget.cameraSectionBackgroundColor,
+                  child: widget.cameraIcon,
+                ),
+              );
+            }
+            return InkWell(
+              onTap: () {
+                _toggle(data: widget.controller.items[itemIndex]);
+              },
               child: Stack(
                 children: <Widget>[
                   Positioned.fill(
                     child: Ink(
                       decoration: BoxDecoration(
                         image: DecorationImage(
-                          image:
-                              MemoryImage(widget.controller.items[index].data),
+                          image: MemoryImage(
+                              widget.controller.items[itemIndex].thumbnail),
                           fit: BoxFit.cover,
                         ),
                       ),
                     ),
                   ),
-                  if (widget.controller.items[index].asset.type ==
+                  if (widget.controller.items[itemIndex].asset.type ==
                       AssetType.video)
                     Align(
                       alignment: widget.videoIconAlign,
@@ -107,7 +178,7 @@ class _GridGalleryState extends State<GridGallery> {
                         child: widget.videoIcon,
                       ),
                     ),
-                  if (!widget.controller.items[index].isSelected)
+                  if (!widget.controller.items[itemIndex].isSelected)
                     Align(
                       alignment: Alignment.topRight,
                       child: Padding(
@@ -126,7 +197,7 @@ class _GridGalleryState extends State<GridGallery> {
                         ),
                       ),
                     ),
-                  if (widget.controller.items[index].isSelected)
+                  if (widget.controller.items[itemIndex].isSelected)
                     Align(
                       alignment: Alignment.topRight,
                       child: Padding(
@@ -138,7 +209,7 @@ class _GridGalleryState extends State<GridGallery> {
                               width: widget.selectedCircleSize,
                               height: widget.selectedCircleSize,
                               decoration: BoxDecoration(
-                                color: Colors.red,
+                                color: widget.selectedBackgroundColor,
                                 shape: BoxShape.circle,
                                 border: Border.all(
                                   color: Colors.white.withOpacity(0.8),
@@ -147,11 +218,8 @@ class _GridGalleryState extends State<GridGallery> {
                               ),
                             ),
                             Text(
-                              '${widget.controller.selectedIndexes.indexOf(index) + 1}',
-                              style: const TextStyle(
-                                fontWeight: FontWeight.w900,
-                                color: Colors.white,
-                              ),
+                              '${widget.controller.selectedIndexes.indexOf(itemIndex) + 1}',
+                              style: widget.selectedTextStyle,
                             ),
                           ],
                         ),
@@ -159,8 +227,8 @@ class _GridGalleryState extends State<GridGallery> {
                     ),
                 ],
               ),
-            ),
-          ),
+            );
+          },
         ),
       ),
     );
