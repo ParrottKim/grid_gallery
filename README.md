@@ -1,18 +1,9 @@
-<!--
-This README describes the package. If you publish this package to pub.dev,
-this README's contents appear on the landing page for your package.
+# grid_gallery
+<img src="https://img.shields.io/static/v1?label=platform&message=flutter&color=1ebbfd" alt="github">
 
-For information about how to write a good package README, see the guide for
-[writing package pages](https://dart.dev/guides/libraries/writing-package-pages).
+![grid_gallery](https://user-images.githubusercontent.com/83802425/209039655-8841adc0-51e7-4387-bb3e-a89171b34d60.gif)
 
-For general information about developing packages, see the Dart guide for
-[creating packages](https://dart.dev/guides/libraries/create-library-packages)
-and the Flutter guide for
-[developing packages and plugins](https://flutter.dev/developing-packages).
--->
-
-TODO: Put a short description of the package here that helps potential users
-know whether this package might be useful for them.
+A flutter package provides customizable widget to user select and list up images in device storage without android and iOS native photo picker.
 
 ## Features
 
