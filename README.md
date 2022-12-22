@@ -5,23 +5,22 @@ A flutter package provides customizable widget to user select and list up images
 
 ![grid_gallery](https://user-images.githubusercontent.com/83802425/209039655-8841adc0-51e7-4387-bb3e-a89171b34d60.gif)
 
-
-## Features
-
-TODO: List what your package can do. Maybe include images, gifs, or videos.
-
 ## Getting started
 
 TODO: List prerequisites and provide or point to information on how to
 start using the package.
 
 ## Usage
+### Request for permission
+#### Android
+No configuration required
 
-TODO: Include short and useful examples for package users. Add longer examples
-to `/example` folder.
-
-```dart
-const like = 'sample';
+#### iOS
+```xml
+<key>NSPhotoLibraryUsageDescription</key>
+<string>In order to access your photo library</string>
+<key>NSCameraUsageDescription</key>
+<string>In order to access your camera</string>
 ```
 
 ## Additional information
