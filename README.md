@@ -16,6 +16,7 @@ start using the package.
 No configuration required
 
 #### iOS
+Add the following keys and value to `Info.plist` file, located in `<project root>/ios/Runner/Info.plist`
 ```xml
 <key>NSPhotoLibraryUsageDescription</key>
 <string>In order to access your photo library</string>
