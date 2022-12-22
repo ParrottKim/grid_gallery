@@ -11,6 +11,7 @@ class GridGallery extends StatefulWidget {
   GridGallery({
     GalleryController? controller,
     this.crossAxisCount = 3,
+    this.pageSize = 20,
     this.videoIcon = const Icon(
       Icons.videocam,
       color: Colors.white,
@@ -44,6 +45,8 @@ class GridGallery extends StatefulWidget {
   final GalleryController controller;
 
   final int crossAxisCount;
+  final int pageSize;
+
   final Icon videoIcon;
   final Alignment videoIconAlign;
 
