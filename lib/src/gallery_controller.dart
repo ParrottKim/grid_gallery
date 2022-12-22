@@ -28,8 +28,10 @@ class GalleryController extends ChangeNotifier {
     if (_ps.isAuth) {
       List<AssetPathEntity> albums =
           await PhotoManager.getAssetPathList(onlyAll: true);
-      List<AssetEntity> media =
-          await albums[0].getAssetListPaged(size: 10, page: _currentPage);
+      List<AssetEntity> media = await albums[0].getAssetListPaged(
+        size: _gridGalleryKey.currentState!.widget.pageSize,
+        page: _currentPage,
+      );
       List<GalleryModel> temp = [];
 
       for (var asset in media) {
@@ -102,7 +104,7 @@ class GalleryController extends ChangeNotifier {
           ];
           _items.removeLast();
           _selectedIndexes = [for (var value in _selectedIndexes) value + 1];
-          _selectedIndexes = [0, ..._selectedIndexes];
+          _selectedIndexes = [..._selectedIndexes, 0];
         }
       }
     });
