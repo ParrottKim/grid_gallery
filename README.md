@@ -1,4 +1,5 @@
 # grid_gallery
+<a href="https://pub.dev/packages/grid_gallery"><img src="https://img.shields.io/pub/v/grid_gallery.svg?style=flat?logo=dart" alt="pub.dev"></a>
 <img src="https://img.shields.io/static/v1?label=platform&message=flutter&color=1ebbfd" alt="github">
 
 A Flutter package provides customizable widget to user select and list up images in device storage without android and iOS native photo picker.
