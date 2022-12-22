@@ -1,7 +1,8 @@
 name: grid_gallery
 description: A Flutter package provides customizable widget to user select and list up images in device storage without android and iOS native photo picker.
 version: 0.0.1
-homepage: https://github.com/ParrottKim/grid_gallery
+homepage: https://github.com/ParrottKim/
+repository: https://github.com/ParrottKim/grid_gallery
 
 environment:
   sdk: '>=2.18.5 <3.0.0'
@@ -12,6 +13,7 @@ dependencies:
     sdk: flutter
     
   image_picker: ^0.8.6
+  path: ^1.8.2
   photo_manager: ^2.5.2
 
 dev_dependencies:
