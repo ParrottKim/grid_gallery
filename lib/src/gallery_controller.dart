@@ -29,7 +29,7 @@ class GalleryController extends ChangeNotifier {
       List<AssetPathEntity> albums =
           await PhotoManager.getAssetPathList(onlyAll: true);
       List<AssetEntity> media =
-          await albums[0].getAssetListPaged(size: 30, page: _currentPage);
+          await albums[0].getAssetListPaged(size: 10, page: _currentPage);
       List<GalleryModel> temp = [];
 
       for (var asset in media) {
@@ -80,14 +80,49 @@ class GalleryController extends ChangeNotifier {
 
   getPhoto() async {
     final ImagePicker _picker = ImagePicker();
-    _photo = await _picker.pickImage(source: ImageSource.camera);
+    _photo = await _picker
+        .pickImage(source: ImageSource.camera)
+        .then((recordedImage) async {
+      if (recordedImage != null) {
+        final AssetEntity? asset = await PhotoManager.editor.saveImageWithPath(
+          recordedImage.path,
+          title: basename(recordedImage.path),
+        );
+        if (asset != null) {
+          final thumbnail =
+              await asset.thumbnailDataWithSize(ThumbnailSize(200, 200));
+          final data = await asset.file;
+          _items = [
+            GalleryModel(
+                thumbnail: thumbnail!,
+                data: data!,
+                asset: asset,
+                isSelected: true),
+            ..._items,
+          ];
+          _items.removeLast();
+          _selectedIndexes = [for (var value in _selectedIndexes) value + 1];
+          _selectedIndexes = [0, ..._selectedIndexes];
+        }
+      }
+    });
+    refreshWidget();
+    notifyListeners();
+  }
+
+  refresh() async {
+    _items.clear();
+    _selectedIndexes.clear();
+    _currentPage = 0;
+    await load();
     refreshWidget();
     notifyListeners();
   }
 
   // add(GalleryModel data) {
-  //   _items = [..._items, data];
+  //   _items = [data, ..._items];
   //   _selectedIndexes.add(_items.indexOf(data));
+  //   refreshWidget();
   //   notifyListeners();
   // }
 

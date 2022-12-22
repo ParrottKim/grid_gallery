@@ -1,3 +1,4 @@
+import 'package:path/path.dart';
 import 'package:flutter/material.dart';
 import 'package:grid_gallery/src/callback/callback.dart';
 import 'package:grid_gallery/src/model/gallery_model.dart';
@@ -99,8 +100,8 @@ class _GridGalleryState extends State<GridGallery> {
     super.dispose();
   }
 
-  _load() {
-    widget.controller.load();
+  _load() async {
+    await widget.controller.load();
   }
 
   _toggle({required GalleryModel data}) {
@@ -108,14 +109,18 @@ class _GridGalleryState extends State<GridGallery> {
     widget.onChanged?.call();
   }
 
+  _refresh() async {
+    await widget.controller.refresh();
+  }
+
   _() {
     setState(() {});
   }
 
-  _handleScrollEvent(ScrollNotification scroll) {
+  _handleScrollEvent(ScrollNotification scroll) async {
     if (scroll.metrics.pixels / scroll.metrics.maxScrollExtent > 0.7) {
       if (widget.controller.currentPage != widget.controller.lastPage) {
-        widget.controller.load();
+        await _load();
       }
     }
   }
@@ -127,7 +132,7 @@ class _GridGalleryState extends State<GridGallery> {
         : widget.controller.items.length;
 
     return RefreshIndicator(
-      onRefresh: () async => await _load(),
+      onRefresh: () async => await _refresh(),
       child: NotificationListener<ScrollNotification>(
         onNotification: (ScrollNotification scroll) {
           _handleScrollEvent(scroll);
@@ -145,7 +150,7 @@ class _GridGalleryState extends State<GridGallery> {
             final itemIndex = widget.isCameraSupported ? index - 1 : index;
             if (widget.isCameraSupported && index == 0) {
               return InkWell(
-                onTap: () async {},
+                onTap: () async => widget.controller.getPhoto(),
                 child: Ink(
                   color: widget.cameraSectionBackgroundColor,
                   child: widget.cameraIcon,
