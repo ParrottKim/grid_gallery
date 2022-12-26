@@ -65,8 +65,10 @@ class GalleryController extends ChangeNotifier {
         .first);
 
     if (_selectedIndexes.contains(index)) {
+      _gridGalleryKey.currentState?.widget.onRemoved?.call(index);
       _selectedIndexes.remove(index);
     } else {
+      _gridGalleryKey.currentState?.widget.onAdded?.call(index);
       _selectedIndexes.add(index);
     }
     refreshWidget();

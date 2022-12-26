@@ -37,6 +37,8 @@ class GridGallery extends StatefulWidget {
       color: Colors.white,
     ),
     this.onChanged,
+    this.onAdded,
+    this.onRemoved,
   })  : controller = controller ?? GalleryController(),
         selectedBackgroundColor =
             selectedBackgroundColor ?? Colors.black.withOpacity(0.4),
@@ -67,6 +69,8 @@ class GridGallery extends StatefulWidget {
   final TextStyle selectedTextStyle;
 
   final ChangedCallback? onChanged;
+  final AddedCallback? onAdded;
+  final RemovedCallback? onRemoved;
 
   @override
   State<GridGallery> createState() => _GridGalleryState();

@@ -162,6 +162,12 @@ class PhotoSelectPage extends StatelessWidget {
         onChanged: () {
           print('main: ${controller.selectedIndexes}');
         },
+        onAdded: (index) {
+          print('onAdded: ${index}');
+        },
+        onRemoved: (index) {
+          print('onRemoved: ${index}');
+        },
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => controller.deselectAll(),
