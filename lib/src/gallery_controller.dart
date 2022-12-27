@@ -85,7 +85,7 @@ class GalleryController extends ChangeNotifier {
   toggle({required GalleryModel data}) {
     final index = _items.indexOf(data);
 
-    _items[_selectedIndexes[index]].isSelected = !data.isSelected;
+    _items[index].isSelected = !data.isSelected;
 
     if (_selectedIndexes.contains(index)) {
       _gridGalleryKey.currentState?.widget.onRemoved?.call(index);
