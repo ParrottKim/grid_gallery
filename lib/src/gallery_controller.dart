@@ -130,8 +130,9 @@ class GalleryController extends ChangeNotifier {
             element.data == data.data && element.asset == data.asset)
         .first);
 
-    _items[selectedIndexes[index]].isSelected = false;
+    _items[index].isSelected = false;
     _selectedIndexes.remove(selectedIndexes[index]);
+
     refreshWidget();
     notifyListeners();
   }

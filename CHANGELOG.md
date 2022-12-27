@@ -24,3 +24,7 @@
 ## 0.0.3+5
 
 * Fix 'remove' method issue
+
+## 0.0.3+6
+
+* Fix 'remove' method issue
