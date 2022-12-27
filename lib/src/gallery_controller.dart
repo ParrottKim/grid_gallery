@@ -131,7 +131,7 @@ class GalleryController extends ChangeNotifier {
         .first);
 
     _items[index].isSelected = false;
-    _selectedIndexes.remove(selectedIndexes[index]);
+    _selectedIndexes.remove(index);
 
     refreshWidget();
     notifyListeners();
