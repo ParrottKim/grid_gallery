@@ -119,8 +119,9 @@ class _MyHomePageState extends State<MyHomePage> {
               itemCount: _controller.selectedIndexes.length,
               itemBuilder: (context, index) => InkWell(
                 onTap: () {
-                  print('${_controller.items[index].asset}');
-                  print('${_controller.items[index].data}');
+                  _controller.remove(_controller.items[index]);
+                  // print('${_controller.items[index].asset}');
+                  // print('${_controller.items[index].data}');
                 },
                 child: AspectRatio(
                   aspectRatio: 1,

@@ -50,38 +50,6 @@ class GalleryController extends ChangeNotifier {
     notifyListeners();
   }
 
-  toggle({required GalleryModel data}) {
-    _items = [
-      for (final value in _items)
-        if (value.data == data.data)
-          data.copyWith(isSelected: !data.isSelected)
-        else
-          value,
-    ];
-
-    final index = _items.indexOf(_items
-        .where((element) =>
-            element.data == data.data && element.asset == data.asset)
-        .first);
-
-    if (_selectedIndexes.contains(index)) {
-      _gridGalleryKey.currentState?.widget.onRemoved?.call(index);
-      _selectedIndexes.remove(index);
-    } else {
-      _gridGalleryKey.currentState?.widget.onAdded?.call(index);
-      _selectedIndexes.add(index);
-    }
-    refreshWidget();
-    notifyListeners();
-  }
-
-  deselectAll() {
-    _items = [for (final value in _items) value.copyWith(isSelected: false)];
-    _selectedIndexes.clear();
-    refreshWidget();
-    notifyListeners();
-  }
-
   getPhoto() async {
     final ImagePicker _picker = ImagePicker();
     _photo = await _picker
@@ -114,6 +82,29 @@ class GalleryController extends ChangeNotifier {
     notifyListeners();
   }
 
+  toggle({required GalleryModel data}) {
+    final index = _items.indexOf(data);
+
+    _items[_selectedIndexes[index]].isSelected = !data.isSelected;
+
+    if (_selectedIndexes.contains(index)) {
+      _gridGalleryKey.currentState?.widget.onRemoved?.call(index);
+      _selectedIndexes.remove(index);
+    } else {
+      _gridGalleryKey.currentState?.widget.onAdded?.call(index);
+      _selectedIndexes.add(index);
+    }
+    refreshWidget();
+    notifyListeners();
+  }
+
+  deselectAll() {
+    _items = [for (final value in _items) value.copyWith(isSelected: false)];
+    _selectedIndexes.clear();
+    refreshWidget();
+    notifyListeners();
+  }
+
   refresh() async {
     _items.clear();
     _selectedIndexes.clear();
@@ -130,13 +121,14 @@ class GalleryController extends ChangeNotifier {
   //   notifyListeners();
   // }
 
-  // remove(GalleryModel data) {
-  //   _items = [
-  //     for (final value in _items)
-  //       if (value.data != data.data) data,
-  //   ];
-  //   notifyListeners();
-  // }
+  remove(GalleryModel data) {
+    final index = _items.indexOf(data);
+
+    _items[_selectedIndexes[index]].isSelected = false;
+    _selectedIndexes.removeAt(index);
+    refreshWidget();
+    notifyListeners();
+  }
 
   // refresh() async {
   //   await fetchNewMedia();
