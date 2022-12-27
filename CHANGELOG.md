@@ -6,7 +6,7 @@
 
 * Add 'onAdded', 'onRemoved' callbacks
 
-## 0.03
+## 0.0.3
  
 * Refactoring
 * Add 'remove' method
