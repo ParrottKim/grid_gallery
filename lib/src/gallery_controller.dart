@@ -83,7 +83,10 @@ class GalleryController extends ChangeNotifier {
   }
 
   toggle({required GalleryModel data}) {
-    final index = _items.indexOf(data);
+    final index = _items.indexOf(_items
+        .where((element) =>
+            element.data == data.data && element.asset == data.asset)
+        .first);
 
     _items[index].isSelected = !data.isSelected;
 
@@ -122,7 +125,10 @@ class GalleryController extends ChangeNotifier {
   // }
 
   remove(GalleryModel data) {
-    final index = _items.indexOf(data);
+    final index = _items.indexOf(_items
+        .where((element) =>
+            element.data == data.data && element.asset == data.asset)
+        .first);
 
     _items[_selectedIndexes[index]].isSelected = false;
     _selectedIndexes.removeAt(index);
